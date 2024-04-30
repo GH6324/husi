@@ -253,7 +253,8 @@ class ScannerActivity : ThemedActivity() {
                                     }
                                 }
                             } else {
-                                Toast.makeText(app, R.string.action_import_err, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(app, R.string.action_import_err, Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         } catch (e: SubscriptionFoundException) {
                             startActivity(
@@ -268,7 +269,8 @@ class ScannerActivity : ThemedActivity() {
                         } catch (e: Throwable) {
                             Logs.w(e)
                             onMainDispatcher {
-                                Toast.makeText(app, R.string.action_import_err, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(app, R.string.action_import_err, Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         }
                     }
@@ -302,6 +304,18 @@ class ScannerActivity : ThemedActivity() {
     // so useFront used to record it.
     // sfa use select to resolve it.
     private var useFront = false
+    private lateinit var flash: MenuItem
+
+    private fun resetFlash() {
+        flash.setIcon(R.drawable.ic_action_flight_on)
+        flash.setTitle(R.string.action_flash_on)
+        flash.isVisible = true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        flash = menu.findItem(R.id.action_flash)
+        return super.onPrepareOptionsMenu(menu)
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -324,9 +338,14 @@ class ScannerActivity : ThemedActivity() {
             // Switch front or back camera.
             R.id.action_camera_switch -> {
                 useFront = !useFront
+                camera.cameraControl.enableTorch(false)
                 val cameraSelector = if (useFront) {
+                    flash.isVisible = false
+
                     CameraSelector.DEFAULT_FRONT_CAMERA
                 } else {
+                    resetFlash()
+
                     CameraSelector.DEFAULT_BACK_CAMERA
                 }
                 cameraProvider.unbindAll()

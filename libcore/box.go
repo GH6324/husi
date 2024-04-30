@@ -51,11 +51,9 @@ type BoxInstance struct {
 func NewSingBoxInstance(config string, forTest bool) (b *BoxInstance, err error) {
 	defer catchPanic("NewSingBoxInstance", func(panicErr error) { err = panicErr })
 
-	// parse options
-	var options option.Options
-	err = options.UnmarshalJSON([]byte(config))
+	options, err := parseConfig(config)
 	if err != nil {
-		return nil, E.Cause(err, "decode config")
+		return nil, err
 	}
 
 	// create box
